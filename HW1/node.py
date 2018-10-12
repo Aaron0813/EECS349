@@ -4,6 +4,7 @@ class Node:
     self.children = {}
     # Store the training data
     self.sample = {}
+    self.parent = None
 	# you may want to add additional fields here...
     '''
     Node 是一个结果类，暂时不考虑

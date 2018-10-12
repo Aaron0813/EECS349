@@ -97,6 +97,7 @@ def build_ID3(examples, target, labels, default):
         sub_examples = split_data(examples, best_feature, value)
         sub_node = build_ID3(sub_examples, target, sub_labels, default)
         node.children[str(value)] = sub_node
+        sub_node.parent = node
     return node
 
 
@@ -112,38 +113,43 @@ def ID3(examples, default):
     # PlayTennis
     # Class
 
-
-def build_prune(node, root, examples, set_feature_value):
-    # get to the end
+# return two value, the first means whether this node can be prune
+# the second means whether this node is a leaf--If is a leaf, caller should
+# check it's parent node
+def check_prune(node, set_feature_value):
+    # means this is a leaf
     if node.label in set_feature_value:
-        return
-    is_leaf_parent = 1
+        return False, True
     for label in node.children:
         if not (node.children[label].label in set_feature_value):
-            is_leaf_parent = 0
-            break
+            return False, False
+    return True, False
 
-    # find leaves' parent node
-    if is_leaf_parent == 1:
-        previous_accuracy = test(root, examples)
-        # get a copy
-        temp_node = Node()
-        temp_node.label = node.label
-        # for label in node.children:
-        #     temp_node.children[label] = node.children[label]
 
-        most_feature = choose_most_feature(node.sample, "Class")
-        # print(most_feature)
-        node.label = most_feature
-        # 暂时删除节点
-        # node.children = {}
-        current_accuracy = test(root, examples)
-        if current_accuracy <= previous_accuracy:
-            node.label = temp_node.label
-        else:
-            # Means this leaf is cut, do pruning again
-            build_prune(root, root, examples, set_feature_value)
-            # print("Current : %d  Previous: %d", (current_accuracy, previous_accuracy))
+def do_prune(node, root, examples, set_feature_value):
+    previous_accuracy = test(root, examples)
+    current_label = node.label
+    most_feature = choose_most_feature(node.sample, "Class")
+    node.label = most_feature
+    current_accuracy = test(root, examples)
+    if current_accuracy <= previous_accuracy:
+        node.label = current_label
+    else:
+        # Means this leaf is cut, do pruning again
+        # add some check here
+        is_prunable, is_leaf = check_prune(node.parent, set_feature_value)
+        if is_prunable:
+            # need to be done
+            do_prune(node.parent, root, examples, set_feature_value)
+
+def build_prune(node, root, examples, set_feature_value):
+    is_prunable, is_leaf = check_prune(node, set_feature_value)
+    if is_prunable:
+        do_prune(node, root, examples, set_feature_value)
+    elif is_leaf:
+        is_prunable, is_leaf = check_prune(node.parent, set_feature_value)
+        if is_prunable:
+            do_prune(node.parent, root, examples, set_feature_value)
     else:
         for label in node.children:
             build_prune(node.children[label], root, examples, set_feature_value)
