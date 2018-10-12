@@ -2,6 +2,8 @@ class Node:
   def __init__(self):
     self.label = None
     self.children = {}
+    # Store the training data
+    self.sample = {}
 	# you may want to add additional fields here...
     '''
     Node 是一个结果类，暂时不考虑

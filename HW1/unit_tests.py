@@ -1,4 +1,7 @@
-import ID3, parse, random
+import ID3
+import parse
+import random
+
 
 def testID3AndEvaluate():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1)]
@@ -91,5 +94,6 @@ def testPruningOnHouseData(inFile):
   print(withoutPruning)
   print("average with pruning",sum(withPruning)/len(withPruning)," without: ",sum(withoutPruning)/len(withoutPruning))
 
-testID3AndEvaluate()
+
+# testID3AndEvaluate()
 testPruningOnHouseData("house_votes_84.data")
