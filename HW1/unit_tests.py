@@ -1,7 +1,7 @@
 import ID3
 import parse
 import random
-
+import pandas as pd
 
 def testID3AndEvaluate():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1)]
@@ -64,35 +64,53 @@ def testPruningOnHouseData(inFile):
   withPruning = []
   withoutPruning = []
   data = parse.parse(inFile)
-  for i in range(100):
-    random.shuffle(data)
-    train = data[:len(data)//2]
-    valid = data[len(data)//2:3*len(data)//4]
-    test = data[3*len(data)//4:]
-  
-    tree = ID3.ID3(train, 'democrat')
-    acc = ID3.test(tree, train)
-    print("training accuracy: ",acc)
-    acc = ID3.test(tree, valid)
-    print("validation accuracy: ",acc)
-    acc = ID3.test(tree, test)
-    print("test accuracy: ",acc)
-  
-    ID3.prune(tree, valid)
-    acc = ID3.test(tree, train)
-    print("pruned tree train accuracy: ",acc)
-    acc = ID3.test(tree, valid)
-    print("pruned tree validation accuracy: ",acc)
-    acc = ID3.test(tree, test)
-    print("pruned tree test accuracy: ",acc)
-    withPruning.append(acc)
-    tree = ID3.ID3(train+valid, 'democrat')
-    acc = ID3.test(tree, test)
-    print("no pruning test accuracy: ",acc)
-    withoutPruning.append(acc)
-  print(withPruning)
-  print(withoutPruning)
-  print("average with pruning",sum(withPruning)/len(withPruning)," without: ",sum(withoutPruning)/len(withoutPruning))
+  with_prunings = []
+  without_prunings = []
+  for size in range(10, 301):
+    for i in range(100):
+      random.shuffle(data)
+      train = data[:size]
+      valid = data[size:(len(data) + size) // 2]
+      test = data[(len(data) + size) // 2:]
+
+      tree = ID3.ID3(train, 'democrat')
+      '''
+      acc = ID3.test(tree, train)
+      # print("training accuracy: ",acc)
+      acc = ID3.test(tree, valid)
+      # print("validation accuracy: ",acc)
+      acc = ID3.test(tree, test)
+      # print("test accuracy: ",acc)
+      '''
+
+      ID3.prune(tree, valid)
+      '''
+      acc = ID3.test(tree, train)
+      # print("pruned tree train accuracy: ",acc)
+      acc = ID3.test(tree, valid)
+      # print("pruned tree validation accuracy: ",acc)
+      '''
+      acc = ID3.test(tree, test)
+      # print("pruned tree test accuracy: ",acc)
+      withPruning.append(acc)
+      tree = ID3.ID3(train + valid, 'democrat')
+      acc = ID3.test(tree, test)
+      # print("no pruning test accuracy: ",acc)
+      withoutPruning.append(acc)
+    # print(withPruning)
+    # print(withoutPruning)
+    with_prunings.append(sum(withPruning) / len(withPruning))
+    without_prunings.append(sum(withoutPruning) / len(withoutPruning))
+    # print("average with pruning",sum(withPruning)/len(withPruning),
+    # " without: ",sum(withoutPruning)/len(withoutPruning))
+  print("with_prunnings")
+  print(with_prunings)
+  print("without_prunnings")
+  print(without_prunings)
+  x = pd.DataFrame(with_prunings)
+  x.to_csv('x.csv')
+  y = pd.DataFrame(without_prunings)
+  y.to_csv('y.csv')
 
 
 # testID3AndEvaluate()

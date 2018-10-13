@@ -118,6 +118,8 @@ def ID3(examples, default):
 # check it's parent node
 def check_prune(node, set_feature_value):
     # means this is a leaf
+    if node is None:
+        return False, False
     if node.label in set_feature_value:
         return False, True
     for label in node.children:
