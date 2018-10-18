@@ -1,7 +1,7 @@
 import csv
 
 '''
-数据示例
+sample
 {
         "Class": "republican", 
         "handicapped-infants": "n", 

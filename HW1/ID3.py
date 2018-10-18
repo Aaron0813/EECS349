@@ -113,6 +113,7 @@ def ID3(examples, default):
     # PlayTennis
     # Class
 
+
 # return two value, the first means whether this node can be prune
 # the second means whether this node is a leaf--If is a leaf, caller should
 # check it's parent node
@@ -144,6 +145,7 @@ def do_prune(node, root, examples, set_feature_value):
             # need to be done
             do_prune(node.parent, root, examples, set_feature_value)
 
+
 def build_prune(node, root, examples, set_feature_value):
     is_prunable, is_leaf = check_prune(node, set_feature_value)
     if is_prunable:
@@ -163,8 +165,6 @@ def prune(node, examples):
     to improve accuracy on the validation data; the precise pruning strategy is up to you.
     '''
     feature_values = [data['Class'] for data in node.sample]
-    # There is a small problem here, what if the validation set is too small that do not have enough "Class"
-    # feature_values = [example['Class'] for example in examples]
     set_feature_value = set(feature_values)
     build_prune(node, node, examples, set_feature_value)
 
